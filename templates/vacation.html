@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<style>
+    #table_vacationlist {
+        border: 1px solid cyan;
+        position: fixed;
+        float: left;
+        margin: 10px;
+    }
+    .edit_form form div {
+        margin-left: 20px;
+        margin-top: 20px;
+        left: 0;
+    }
+    .edit_form form div label {
+        width: 80px;
+    }
+    .edit_form form div input {
+        width: 150px;
+        right: 0;
+    }
+    .btn-success {
+        margin: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <button class="btn btn-success" id="vacation_add">添加请假</button>
+
+
+	<table id='table_vacationlist'">
+		<thead>
+			<tr>
+				<th class="table_common">日期</th>
+				<th class="table_common">请假员工</th>
+				<th class="table_common">工号</th>
+                <th class="table_common">操作</th>
+			</tr>
+		</thead>
+        <tbody>
+            {% for item in vacation_list %}
+            <tr vacation_id="{{ item.id }}">
+                <td class="table_common table_date" >{{ item.date | date:'Y-n-d' }}</td>
+                <td class="table_common table_name" >{{ item.employee.name }}</td>
+                <td class="table_common table_uid">{{ item.employee_id }}</td>
+                <td class="table_common" >
+                    <form>
+                        <input type="button" class='vacation_edit' value="编辑">
+                        <input type="button" class='vacation_del' value="删除">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="shade hide"></div>
+
+    <div class="edit_form hide">
+        <form>
+            <div>
+                <input type="hidden" id='edit_form_id' name="id">
+            </div>
+            <div>
+                <label for="edit_form_vacationname">日期: </label>
+                <input type="text" id="edit_form_vacationname" name="vacationdate">
+            </div>
+            <div>
+                <label for="edit_form_name">姓名: </label>
+                <input type="text" id="edit_form_name" name="name" readonly>
+            </div>
+            <div>
+                <label for="edit_form_uid">工号: </label>
+                <input type="text" id="edit_form_uid" name="uid">
+            </div>
+            <input type="button" class="edit_form_button edit_form_confirm" value="确定">
+            <input type="button" class="edit_form_button hide" id="edit_form_del" value="删除">
+            <input type="button" class="edit_form_button edit_form_cancel" value="取消">
+        </form>
+    </div>
+
+
+
+{% endblock %}
+
+{% block js %}
+<script>
+
+    $(".vacation_edit").click(function () {
+        $('#edit_form_del').addClass('hide');
+        $('.shade, .edit_form, .edit_form_confirm').removeClass('hide');
+        var vacation_id = $(this).parent().parent().parent().attr('vacation_id');
+        var shiftname = $(this).parent().parent().siblings().html();
+        var ip = $(this).parent().parent().siblings().next().html();
+        var offduty = $(this).parent().parent().siblings().next().next().html();
+        $(".edit_form #edit_form_id").val(vacation_id);
+        $(".edit_form #edit_form_vacationname").val(shiftname);
+        $(".edit_form #edit_form_name").val(ip);
+        $(".edit_form #edit_form_uid").val(offduty);
+    });
+
+    $("#vacation_add").click(function () {
+        $('#edit_form_del').addClass('hide');
+        $('.shade, .edit_form, .edit_form_confirm').removeClass('hide');
+    });
+
+    $(".vacation_del").click(function () {
+        $('.edit_form_confirm').addClass('hide');
+        $('.shade, .edit_form, #edit_form_del').removeClass('hide');
+        var vacation_id = $(this).parent().parent().parent().attr('vacation_id');
+        var shiftname = $(this).parent().parent().siblings().html();
+        var onduty = $(this).parent().parent().siblings().next().html();
+        var offduty = $(this).parent().parent().siblings().next().next().html();
+        $(".edit_form #edit_form_id").val(vacation_id);
+        $(".edit_form #edit_form_vacationname").val(shiftname);
+        $(".edit_form #edit_form_name").val(onduty);
+        $(".edit_form #edit_form_uid").val(offduty);
+    });
+
+    $(".edit_form_cancel").click(function () {
+        $('.shade,.edit_form,.del_form').addClass('hide');
+        $('.edit_form #edit_form_vacationname').val("");
+        $('.edit_form #edit_form_name').val("");
+        $('.edit_form #edit_form_uid').val("");
+        $(".edit_form #edit_form_id").val("");
+    });
+
+    $('.edit_form_confirm').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '../ajax_vacation_mod/',
+            data: $(".edit_form form").serialize(),
+            traditional: true,
+            success: function (ret) {
+                var obj = JSON.parse(ret);
+                if(obj.status){
+                    location.reload()
+                }else{
+                    alert(obj.error)
+                }
+            }
+        })
+    });
+
+    $('#edit_form_del').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '/ajax_vacation_del/',
+            data: $(".edit_form form").serialize(),
+            traditional: true,
+            success: function (ret) {
+                var obj = JSON.parse(ret);
+                if(obj.status){
+                    location.reload()
+                }else{
+                    alert(obj.error)
+                }
+            }
+        })
+    });
+
+</script>
+{% endblock %}

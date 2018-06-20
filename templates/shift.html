@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block css %}
+<style>
+    #table_shiftlist {
+        border: 1px solid cyan;
+        position: fixed;
+        float: left;
+        margin: 10px;
+    }
+    .edit_form form div {
+        margin-left: 20px;
+        margin-top: 20px;
+        left: 0;
+    }
+    .edit_form form div label {
+        width: 80px;
+    }
+    .edit_form form div input {
+        width: 150px;
+        right: 0;
+    }
+    .btn-success {
+        margin: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+    <button class="btn btn-success" id="shift_add">添加班次</button>
+
+
+	<table id='table_shiftlist'">
+		<thead>
+			<tr>
+				<th class="table_common">班次</th>
+				<th class="table_common">上班时间</th>
+				<th class="table_common">下班时间</th>
+				<th class="table_common">工时</th>
+                <th class="table_common">操作</th>
+			</tr>
+		</thead>
+        <tbody>
+            {% for item in shift_list %}
+            <tr shift_id="{{ item.id }}">
+                <td class="table_common table_shiftname" >{{ item.name }}</td>
+                <td class="table_common table_onduty" >{{ item.onduty }}</td>
+                <td class="table_common table_offduty">{{ item.offduty }}</td>
+                <td class="table_common" >{{ item.hours }}</td>
+                <td class="table_common" >
+                    <form>
+                        <input type="button" class='shift_edit' value="编辑">
+                        <input type="button" class='shift_del' value="删除">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="shade hide"></div>
+
+    <div class="edit_form hide">
+        <form>
+            <div>
+                <input type="hidden" id='edit_form_id' name="id">
+            </div>
+            <div>
+                <label for="edit_form_shiftname">班次名: </label>
+                <input type="text" id="edit_form_shiftname" name="shiftname">
+            </div>
+            <div>
+                <label for="edit_form_onduty">上班时间: </label>
+                <input type="text" id="edit_form_onduty" name="onduty">
+            </div>
+            <div>
+                <label for="edit_form_offduty">下班时间: </label>
+                <input type="text" id="edit_form_offduty" name="offduty">
+            </div>
+            <input type="button" class="edit_form_button edit_form_confirm" value="确定">
+            <input type="button" class="edit_form_button hide" id="edit_form_del" value="删除">
+            <input type="button" class="edit_form_button edit_form_cancel" value="取消">
+        </form>
+    </div>
+
+
+
+{% endblock %}
+
+{% block js %}
+<script>
+
+    $(".shift_edit").click(function () {
+        $('#edit_form_del').addClass('hide');
+        $('.shade, .edit_form, .edit_form_confirm').removeClass('hide');
+        var shift_id = $(this).parent().parent().parent().attr('shift_id');
+        var shiftname = $(this).parent().parent().siblings().html();
+        var ip = $(this).parent().parent().siblings().next().html();
+        var offduty = $(this).parent().parent().siblings().next().next().html();
+        $(".edit_form #edit_form_id").val(shift_id);
+        $(".edit_form #edit_form_shiftname").val(shiftname);
+        $(".edit_form #edit_form_onduty").val(ip);
+        $(".edit_form #edit_form_offduty").val(offduty);
+    });
+
+    $("#shift_add").click(function () {
+        $('#edit_form_del').addClass('hide');
+        $('.shade, .edit_form, .edit_form_confirm').removeClass('hide');
+    });
+
+    $(".shift_del").click(function () {
+        $('.edit_form_confirm').addClass('hide');
+        $('.shade, .edit_form, #edit_form_del').removeClass('hide');
+        var shift_id = $(this).parent().parent().parent().attr('shift_id');
+        var shiftname = $(this).parent().parent().siblings().html();
+        var onduty = $(this).parent().parent().siblings().next().html();
+        var offduty = $(this).parent().parent().siblings().next().next().html();
+        $(".edit_form #edit_form_id").val(shift_id);
+        $(".edit_form #edit_form_shiftname").val(shiftname);
+        $(".edit_form #edit_form_onduty").val(onduty);
+        $(".edit_form #edit_form_offduty").val(offduty);
+    });
+
+    $(".edit_form_cancel").click(function () {
+        $('.shade,.edit_form,.del_form').addClass('hide');
+        $('.edit_form #edit_form_shiftname').val("");
+        $('.edit_form #edit_form_onduty').val("");
+        $('.edit_form #edit_form_offduty').val("");
+        $(".edit_form #edit_form_id").val("");
+    });
+
+    $('.edit_form_confirm').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '../ajax_shift_mod/',
+            data: $(".edit_form form").serialize(),
+            traditional: true,
+            success: function (ret) {
+                var obj = JSON.parse(ret);
+                if(obj.status){
+                    location.reload()
+                }else{
+                    alert(obj.error)
+                }
+            }
+        })
+    });
+
+    $('#edit_form_del').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '/ajax_shift_del/',
+            data: $(".edit_form form").serialize(),
+            traditional: true,
+            success: function (ret) {
+                var obj = JSON.parse(ret);
+                if(obj.status){
+                    location.reload()
+                }else{
+                    alert(obj.error)
+                }
+            }
+        })
+    });
+
+</script>
+{% endblock %}

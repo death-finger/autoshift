@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <style>
+        #table_stafflist {
+            border: 1px solid cyan;
+            position: absolute;
+            float: left;
+            overflow: scroll;
+        }
+        .edit_form form div {
+            margin-left: 20px;
+            margin-top: 20px;
+            left: 0;
+        }
+        .edit_form form div label {
+            width: 80px;
+        }
+        .edit_form form div input {
+            width: 150px;
+            right: 0;
+        }
+        #table-frame {
+            width: 1200px;
+            height: 800px;
+            position: relative;
+            margin: 10px;
+        }
+        .cust-date-select {
+            display: block;
+        }
+        .cust-date-select .input-group {
+            width: 200px;
+            float: left;
+            margin: 10px;
+        }
+        .cust-date-select .btn-success {
+            float: left;
+            margin: 10px;
+        }
+        #staff_add {
+            margin: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <button class="btn btn-success" id="staff_add">添加员工</button>
+
+    <div id="table-frame">
+        <table id='table_stafflist'">
+            <thead>
+                <tr>
+                    <th class="table_common" style="min-width: 80px;">操作</th>
+                    <th class="table_common" style="min-width: 80px;">姓名</th>
+                    <th class="table_common" style="min-width: 80px;">工号</th>
+                    {% for item in month_list %}
+                        <th class="table_common" style="min-width: 80px;">2018-{{ item }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in workhour_list %}
+                <tr staff_id="{{ item.staff.id }}">
+                    <td class="table_common" >
+                        <form>
+                            <input type="button" class='staff_edit' value="编辑">
+                            <input type="button" class='staff_del' value="删除">
+                        </form>
+                    </td>
+                    <td class="table_common ">{{ item.staff.name }}</td>
+                    <td class="table_common ">{{ item.staff.uid }}</td>
+                    {% for i in item.hours %}
+                        <td class="table_common">{{ i }}</td>
+                    {% endfor %}
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="clear: both;"></div>
+    </div>
+    
+    <div class="shade hide"></div>
+
+    <div class="edit_form hide">
+        <form>
+            <div>
+                <input type="hidden" id='edit_form_id' name="id">
+            </div>
+            <div>
+                <label for="edit_form_staffname">姓名: </label>
+                <input type="text" id="edit_form_staffname" name="staffname">
+            </div>
+            <div>
+                <label for="edit_form_staffuid">工号: </label>
+                <input type="text" id="edit_form_staffuid" name="staffuid">
+            </div>
+            <input type="button" class="edit_form_button edit_form_confirm" value="确定">
+            <input type="button" class="edit_form_button hide" id="edit_form_del" value="删除">
+            <input type="button" class="edit_form_button edit_form_cancel" value="取消">
+        </form>
+    </div>
+{% endblock %}
+
+{% block js %}
+<script>
+
+    $(".staff_edit").click(function () {
+        $('#edit_form_del').addClass('hide');
+        $('.shade, .edit_form, .edit_form_confirm').removeClass('hide');
+        var staff_id = $(this).parent().parent().parent().attr('staff_id');
+        var staffname = $(this).parent().parent().siblings().html();
+        var staffuid = $(this).parent().parent().siblings().next().html();
+        $(".edit_form #edit_form_id").val(staff_id);
+        $(".edit_form #edit_form_staffname").val(staffname);
+        $(".edit_form #edit_form_staffuid").val(staffuid);
+    });
+
+    $("#staff_add").click(function () {
+        $('#edit_form_del').addClass('hide');
+        $('.shade, .edit_form, .edit_form_confirm').removeClass('hide');
+    });
+
+    $(".staff_del").click(function () {
+        $('.edit_form_confirm').addClass('hide');
+        $('.shade, .edit_form, #edit_form_del').removeClass('hide');
+        var staff_id = $(this).parent().parent().parent().attr('staff_id');
+        var staffname = $(this).parent().parent().siblings().html();
+        var staffuid = $(this).parent().parent().siblings().next().html();
+        $(".edit_form #edit_form_id").val(staff_id);
+        $(".edit_form #edit_form_staffname").val(staffname);
+        $(".edit_form #edit_form_staffuid").val(staffuid);
+    });
+
+    $(".edit_form_cancel").click(function () {
+        $('.shade,.edit_form,.del_form').addClass('hide');
+        $('.edit_form #edit_form_staffname').val("");
+        $('.edit_form #edit_form_staffuid').val("");
+        $(".edit_form #edit_form_id").val("");
+    });
+
+    $('.edit_form_confirm').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '../ajax_staff_mod/',
+            data: $(".edit_form form").serialize(),
+            traditional: true,
+            success: function (ret) {
+                var obj = JSON.parse(ret);
+                if(obj.status){
+                    location.reload()
+                }else{
+                    alert(obj.error)
+                }
+            }
+        })
+    });
+
+    $('#edit_form_del').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '/ajax_staff_del/',
+            data: $(".edit_form form").serialize(),
+            traditional: true,
+            success: function (ret) {
+                var obj = JSON.parse(ret);
+                if(obj.status){
+                    location.reload()
+                }else{
+                    alert(obj.error)
+                }
+            }
+        })
+    });
+
+</script>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <style>
+        #table_hostlist {
+            border: 1px solid cyan;
+            position: absolute;
+            float: left;
+            overflow: scroll;
+        }
+        .edit_form form div {
+            margin-left: 20px;
+            margin-top: 20px;
+            left: 0;
+        }
+        .edit_form form div label {
+            width: 80px;
+        }
+        .edit_form form div input {
+            width: 150px;
+            right: 0;
+        }
+        #table-frame {
+            width: 1200px;
+            height: 800px;
+            position: relative;
+            margin: 10px;
+        }
+        .cust-date-select {
+            display: block;
+        }
+        .cust-date-select .input-group {
+            width: 200px;
+            float: left;
+            margin: 10px;
+        }
+        .cust-date-select .btn-success {
+            float: left;
+            margin: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="cust-date-select">
+        <form action="../schedules/" method="post">
+            <div class="input-group">
+                <span class="input-group-addon">起始日</span>
+                <input type="text" class="form-control" placeholder="2018-06-01" aria-describedby="basic-addon1" name="date_from">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">结束日</span>
+                <input type="text" class="form-control" placeholder="2018-06-30" aria-describedby="basic-addon1" name="date_to">
+            </div>
+            <button type="submit"  class="btn btn-success" id="load">读取排班</button>
+            <div style="clear: both;"></div>
+        </form>
+    </div>
+    <div id="table-frame">
+        <table id='table_hostlist'">
+            <thead>
+                <tr>
+                    <th class="table_common" style="min-width: 80px;">员工</th>
+                    {% for item in date_list %}
+                        <th class="table_common" style="min-width: 80px;">{{ item }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in shift_list %}
+                <tr schedule_id="{{ item.id }}">
+                    <td class="table_common ">{{ item.name }}<br />{{ item.id }}</td>
+                    {% for i in item.shifts %}
+                        <td class="table_common">{{ i }}</td>
+                    {% endfor %}
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div style="clear: both;"></div>
+    </div>
+{% endblock %}

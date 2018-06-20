@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自动排班系统</title>
+    <link href="../static/bootstrap/css/bootstrap.css" rel="stylesheet"/>
+    <style>
+        .hide {
+            display: none;
+        }
+        .shade {
+            left: 0;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            background-color: grey;
+            z-index: 100;
+            opacity: 0.5;
+            position: fixed;
+        }
+        .edit_form {
+            width: 300px;
+            height: 200px;
+            left: 50%;
+            top: 50%;
+            margin-left: -300px;
+            margin-top: -150px;
+            border: 1px solid white;
+            border-radius: 5px;
+            position: fixed;
+            z-index: 110;
+            background-color: white;
+        }
+        .edit_form_button {
+            margin-top: 20px;
+            margin-left: 20%;
+        }
+        .table_common {
+            height: 20px;
+            line-height: 20px;
+            border: 1px solid cyan;
+            text-align: center;
+            width: 100px;
+        }
+        #pg-head {
+            left: 0;
+            right: 0;
+            top: 0;
+            background-color: #030303;
+            border: 1px solid #050505;
+            min-width: 768px;
+            height: 50px;
+            position: fixed;
+        }
+        #title-text {
+            left: 0;
+            width: 350px;!important;
+            height: 20px;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 20px;
+            text-align: left;
+            margin-top: 15px;
+            margin-left: 40px;
+            float: left;
+        }
+        #user_info {
+            right: 20px;
+            height: 20px;
+            width: 20px;
+            color: #ffffff;
+            font-size: 15px;
+            line-height: 20px;
+            text-align: right;
+            margin-top: 15px;
+            margin-right: 75px;
+            float: right;
+        }
+        #menu-left {
+            background-color: #292e34;
+            width: 220px;
+            border: 1px solid #292e34;
+            top: 50px;
+            left: 0;
+            bottom: 0;
+            position: fixed;
+        }
+        .menu-bar {
+            color: #d1d1d1;
+            height: 80px;
+            line-height: 80px;
+            text-align: left;
+            padding-left: 45px;
+            font-size: 16px;
+            display: block;
+            text-decoration: none;
+        }
+        .menu-bar:hover {
+            background-color: #747474;
+        }
+        .menu_text {
+            margin-left: 10px;
+        }
+        #content-right {
+            top: 30px;
+            left: 200px;
+            right: 0;
+            bottom: 0;
+            position: fixed;
+            margin: 35px;
+            overflow: scroll;
+        }
+    </style>
+    {% block css %} {% endblock %}
+</head>
+<body>
+    <div id="pg-head">
+        <div id="title-text">自动排班系统</div>
+    </div>
+
+    <div id="pg-body">
+        <div id="menu-left">
+            <a class="menu-bar" href="/schedules">
+                <span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
+                <span class="menu_text">排班查看</span>
+            </a>
+            <a class="menu-bar" href="/arranges">
+                <span class="glyphicon glyphicon-tasks" aria-hidden="true"></span>
+                <span class="menu_text">排班调整</span>
+            </a>
+            <a class="menu-bar" href="/staffs">
+                <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+                <span class="menu_text">人员管理</span>
+            </a>
+            <a class="menu-bar" href="/shifts">
+                <span class="glyphicon glyphicon-time" aria-hidden="true"></span>
+                <span class="menu_text">班次管理</span>
+            </a>
+            <a class="menu-bar" href="/vacations">
+                <span class="glyphicon glyphicon-plane" aria-hidden="true"></span>
+                <span class="menu_text">请假管理</span>
+            </a>
+        </div>
+        <div id="content-right">
+            {% block content %} {% endblock %}
+        </div>
+    </div>
+
+    <script src="../static/jquery-3.3.1.js"></script>
+    <script src="../static/bootstrap/js/bootstrap.js"></script>
+    {% block js %} {% endblock %}
+</body>
+</html>

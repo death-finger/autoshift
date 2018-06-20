@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block css %}
+    <style>
+        .cust-date-select {
+            display: block;
+        }
+        .cust-date-select .input-group {
+            width: 200px;
+            float: left;
+            margin: 10px;
+        }
+        .cust-date-select .btn-success {
+            float: left;
+            margin: 10px;
+        }
+        #table-arrange {
+            display: block;
+            margin-top: 50px;
+            margin-left: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="cust-date-select">
+        <form action="../arranges/" method="post">
+            <div class="input-group">
+                <span class="input-group-addon">起始日</span>
+                <input type="text" class="form-control" placeholder="2018-06-01" aria-describedby="basic-addon1" name="date_from">
+            </div>
+            <div class="input-group">
+                <span class="input-group-addon">结束日</span>
+                <input type="text" class="form-control" placeholder="2018-06-30" aria-describedby="basic-addon1" name="date_to">
+            </div>
+            <button type="submit"  class="btn btn-success" id="load">读取</button>
+            <button type="button" class="btn btn-success" id="save">保存并排班</button>
+            <div style="clear: both;"></div>
+        </form>
+    </div>
+
+    <div id="table-arrange">
+        <table>
+            <thead>
+                <tr>
+                    <th class="table_common" style="min-width: 80px;">班次</th>
+                    {% for item in date_list %}
+                        <th class="table_common" style="min-width: 30px; font-size: 11px;">{{ item }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in arrange_list %}
+                <tr>
+                    <td class="table_common" >
+                        {{ item.shift }}
+                    </td>
+                    {% for i in item.shift_list %}
+                        <td class="table_common arrange_item" style="min-width: 30px;">
+                            <input type="text" name="{{ item.shift }}_{{ i.date }}" value="{{ i.number }}" style="width: 100%;">
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(".arrange_item > input").change(function () {
+            $(this).attr('value', $(this).prop('value'))
+        });
+
+        $("#save").click(function () {
+            var arrange_submit_list = [];
+            $(".arrange_item > input").each(function () {
+                var name = $(this).prop('name');
+                var number = $(this).attr('value');
+                arrange_submit_list.push({ 'name': name, "number": number })
+            });
+            $.ajax({
+                url: '../ajax_arrange_submit/',
+                type: "POST",
+                data: {'all': JSON.stringify(arrange_submit_list)},
+                traditional: true,
+                success: function (data) {
+                    var obj = JSON.parse(data);
+                    if(obj.status){
+                        alert('Saving Successfully!');
+                        location.reload()
+                    }else{
+                        alert('Failed!')
+                    }
+                }
+            })
+        })
+    </script>
+{% endblock %}
