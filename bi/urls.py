@@ -18,6 +18,7 @@ from django.urls import path
 from AutoShift import views
 
 urlpatterns = [
+    path('', views.Schedule.as_view()),
     path('admin/', admin.site.urls),
     path('schedules/', views.Schedule.as_view()),
     path('arranges/', views.Arrange.as_view()),
